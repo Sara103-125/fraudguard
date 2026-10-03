@@ -28,15 +28,20 @@ st.download_button(
 )
 
 uploaded = st.file_uploader("Upload transactions (CSV)", type="csv")
-if uploaded is None:
+use_example = st.toggle("No file? Score the 50 example transactions instead")
+
+if uploaded is not None:
+    try:
+        df = pd.read_csv(uploaded)
+    except Exception as error:  # malformed file, wrong encoding, ...
+        st.error(f"Could not read the file as CSV: {error}")
+        st.stop()
+elif use_example:
+    df = example.reset_index(drop=True)
+else:
     st.stop()
 
-# --- Read and validate -------------------------------------------------------------
-try:
-    df = pd.read_csv(uploaded)
-except Exception as error:  # malformed file, wrong encoding, ...
-    st.error(f"Could not read the file as CSV: {error}")
-    st.stop()
+# --- Validate ----------------------------------------------------------------------
 
 missing = [c for c in FEATURES if c not in df.columns]
 if missing:
@@ -53,7 +58,7 @@ if non_numeric or df[FEATURES].isna().any().any():
 
 # --- Predict -------------------------------------------------------------------
 with st.spinner(f"Scoring {len(df):,} transactions..."):
-    output = df.join(predict(bundle, df))
+    output = predict(bundle, df).join(df)  # prediction columns first, then the original columns
 
 flagged = int(output["is_fraud"].sum())
 c = st.columns(3)

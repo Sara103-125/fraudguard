@@ -11,9 +11,9 @@ st.set_page_config(page_title="FraudGuard", page_icon="🛡️", layout="wide")
 
 pages = [
     st.Page("app_pages/1_model_performance.py", title="Model performance", icon="📊", default=True),
-    st.Page("app_pages/2_threshold_explorer.py", title="Threshold explorer", icon="🎚️"),
-    st.Page("app_pages/3_transaction_checker.py", title="Transaction checker", icon="🔍"),
-    st.Page("app_pages/4_batch_scoring.py", title="Batch scoring", icon="📁"),
+    st.Page("app_pages/2_threshold_explorer.py", title="Threshold explorer", icon="🎚️", url_path="threshold"),
+    st.Page("app_pages/3_transaction_checker.py", title="Transaction checker", icon="🔍", url_path="checker"),
+    st.Page("app_pages/4_batch_scoring.py", title="Batch scoring", icon="📁", url_path="batch"),
 ]
 
 with st.sidebar:

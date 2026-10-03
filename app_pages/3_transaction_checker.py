@@ -47,7 +47,7 @@ flagged = prediction["is_fraud"] == 1
 st.divider()
 c = st.columns(4)
 c[0].metric("Fraud probability", f"{prediction['fraud_probability']:.2%}")
-c[1].metric("Decision", "🚨 Flag as fraud" if flagged else "✅ Approve",
+c[1].metric("Decision", "🚨 Flag" if flagged else "✅ Approve",
             help=f"Flag when probability ≥ threshold {bundle['threshold']}")
 c[2].metric("Actually was", "Fraud" if is_fraud_actual else "Normal")
 c[3].metric("Amount", f"{row['Amount'].iloc[0]:,.2f}")

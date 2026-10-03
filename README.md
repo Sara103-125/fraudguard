@@ -19,6 +19,8 @@ Built with Python, scikit-learn, imbalanced-learn, XGBoost and SHAP. 100% free t
 - **Cost-based threshold tuning**: a missed fraud costs its amount, a false alarm costs a review fee
 - **SHAP explainability**: global feature importance and per-transaction explanations
 - **Honest evaluation**: threshold chosen on training data only, with a discussion of how noisy the results are
+- **Interactive Streamlit app** with live threshold tuning and per-transaction explanations
+- **Tested**: 16 pytest tests for preprocessing, the cost model and predictions
 
 ## Results
 
@@ -78,7 +80,8 @@ flowchart LR
     G --> H[03 Out-of-fold probabilities<br/>+ cost model -> threshold 0.01]
     G --> I[SHAP explanations]
     H --> J[(models/fraudguard_model.joblib<br/>pipeline + threshold)]
-    J --> K[Streamlit app]
+    J --> K[Streamlit app<br/>4 pages]
+    J --> L[pytest tests]
 ```
 
 1. **EDA** ([notebook 01](notebooks/01_eda.ipynb)): fraud is 0.17% of transactions; fraud amounts have a lower
@@ -97,11 +100,39 @@ flowchart LR
 - **The threshold is a business decision**: a higher false-alarm cost leads to a higher threshold (0.003 at cost 1,
   0.23 at cost 25).
 
+## Streamlit app
+
+An interactive app with four pages. It runs on the saved model and small result files, so it works
+**without downloading the dataset**.
+
+| Page | What it does |
+|---|---|
+| **Model performance** | Metrics for all models, confusion matrix (default or cost-tuned threshold), PR curves |
+| **Threshold explorer** | A slider that updates precision, recall, frauds caught, false alarms and estimated cost live, with an adjustable false-alarm cost |
+| **Transaction checker** | Pick a random fraud / normal transaction or one by ID: fraud probability, decision and a SHAP explanation of why |
+| **Batch scoring** | Upload a CSV (or use the built-in example) and download the predictions as CSV |
+
+### Screenshots
+
+**Model performance**
+![Model performance page](reports/screenshots/1_model_performance.png)
+
+**Threshold explorer**
+![Threshold explorer page](reports/screenshots/2_threshold_explorer.png)
+
+**Transaction checker with SHAP explanation**
+![Transaction checker page](reports/screenshots/3_transaction_checker.png)
+
+**Batch scoring**
+![Batch scoring page](reports/screenshots/4_batch_scoring.png)
+
 ## Project structure
 
 ```
 fraud-detection/
-├── fraudguard/              # reusable Python package (used by notebooks and app)
+├── streamlit_app.py         # app entry point (navigation)
+├── app_pages/               # the four app pages + shared loaders
+├── fraudguard/              # reusable Python package (used by notebooks, app and tests)
 │   ├── config.py            # paths, column names, random seed
 │   ├── data.py              # load the dataset
 │   ├── preprocessing.py     # stratified split, scaler
@@ -115,11 +146,15 @@ fraud-detection/
 │   ├── 01_eda.ipynb
 │   ├── 02_modeling.ipynb
 │   └── 03_threshold_and_explainability.ipynb
+├── tests/                   # pytest tests + a 10-row fixture CSV
 ├── scripts/
 │   └── download_data.py     # downloads the dataset (not committed to git)
-├── models/                  # final model (114 KB) + small files for the app
-├── reports/figures/         # charts used in this README
-└── requirements.txt
+├── models/                  # final model (114 KB) + small files for the app (~1.5 MB total)
+├── reports/
+│   ├── figures/             # charts from the notebooks
+│   └── screenshots/         # app screenshots
+├── requirements.txt
+└── pyproject.toml           # pytest settings
 ```
 
 ## Setup and run
@@ -133,30 +168,45 @@ cd fraudguard
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+```
 
+**Run the app** (no dataset needed):
+
+```powershell
+streamlit run streamlit_app.py      # opens http://localhost:8501
+```
+
+**Run the tests** (no dataset needed, ~2 seconds):
+
+```powershell
+pytest -v
+```
+
+The 16 tests cover preprocessing (stratified split, no train/test overlap, scaling only `Time`/`Amount`
+with training statistics), the cost model (a hand-checked example and edge cases) and predictions of the saved
+model on real sample transactions.
+
+**Reproduce the analysis** (downloads the data, then run the notebooks in order):
+
+```powershell
 python scripts\download_data.py     # ~150 MB, no account needed
 jupyter notebook notebooks           # run 01, 02, 03 in order
 ```
 
-The trained model is already included in `models/`, so you only need to run the notebooks to reproduce or
-change the results (notebook 02 takes ~4 minutes, notebook 03 ~1 minute).
+The trained model is already included in `models/`, so you only need the notebooks to reproduce or change the
+results (notebook 02 takes ~4 minutes, notebook 03 ~1 minute). Running notebooks 02 and 03 regenerates every file
+in `models/`.
 
 **If the OpenML download fails**, get the data from Kaggle instead (a free account is needed):
 1. Go to <https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud> and sign in.
 2. Click **Download** and unzip the archive.
 3. Put `creditcard.csv` in `data/raw/` (so the path is `data/raw/creditcard.csv`).
 
-## Streamlit app
+### Deploying for free (optional)
 
-*Coming next:* an interactive app with four pages:
-1. **Model performance**: metrics for all models, confusion matrix, PR curve
-2. **Threshold explorer**: a slider that updates precision, recall, frauds caught, false alarms and cost live
-3. **Transaction checker**: fraud probability, decision and SHAP explanation for a chosen transaction
-4. **Batch scoring**: upload a CSV and download predictions
-
-### Screenshots
-
-*Will be added once the app is built.*
+The app is ready for [Streamlit Community Cloud](https://streamlit.io/cloud): sign in with GitHub, click
+**Create app**, choose this repository, branch `main` and main file `streamlit_app.py`. No secrets or dataset
+are needed.
 
 ## Limitations and ethics
 
@@ -181,7 +231,7 @@ change the results (notebook 02 takes ~4 minutes, notebook 03 ~1 minute).
 - **Amount-aware decisions**: flag when `probability x amount > review cost`, instead of one fixed threshold
 - **Hyperparameter tuning** (e.g. Optuna) and a check of probability calibration
 - **Customer-level features** (spending history, device, merchant), which matter most in real fraud systems
-- **Deployment** on Streamlit Community Cloud, plus **CI** with GitHub Actions running the tests
+- **Deploy** the app on Streamlit Community Cloud, and add **CI** with GitHub Actions to run the tests on every push
 
 ## Dataset credit
 

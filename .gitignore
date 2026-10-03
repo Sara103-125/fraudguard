@@ -1,0 +1,37 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# --- Virtual environment ---
+.venv/
+venv/
+env/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Data (downloaded by scripts/download_data.py, never committed) ---
+data/raw/
+data/processed/
+*.csv
+*.parquet
+*.arff
+!tests/fixtures/*.csv
+
+# --- Large generated files ---
+# The final model (models/fraudguard_xgb.joblib) is small (<1 MB) and IS committed
+# so the app works straight after cloning. Bulky artefacts are ignored:
+models/*.pkl
+models/test_set.joblib
+models/train_set.joblib
+
+# --- OS / editors ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Streamlit secrets (not used, but never commit them) ---
+.streamlit/secrets.toml

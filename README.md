@@ -247,4 +247,4 @@ The raw data is not included in this repository; `scripts/download_data.py` down
 
 ## Author
 
-Built by [@Sara103-125](https://github.com/Sara103-125)
+**Sara Zaigham** · [GitHub @Sara103-125](https://github.com/Sara103-125)

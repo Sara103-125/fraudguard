@@ -35,3 +35,5 @@ Thumbs.db
 
 # --- Streamlit secrets (not used, but never commit them) ---
 .streamlit/secrets.toml
+.tmp/
+.pip-cache/

@@ -163,7 +163,7 @@ Requires **Python 3.12**. Commands are for Windows PowerShell; on macOS/Linux us
 and forward slashes.
 
 ```powershell
-git clone https://github.com/YOUR-USERNAME/fraudguard.git
+git clone https://github.com/Sara103-125/fraudguard.git
 cd fraudguard
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
@@ -247,4 +247,4 @@ The raw data is not included in this repository; `scripts/download_data.py` down
 
 ## Author
 
-**YOUR NAME** · [LinkedIn](https://www.linkedin.com/in/YOUR-PROFILE) · [GitHub](https://github.com/YOUR-USERNAME)
+Built by [@Sara103-125](https://github.com/Sara103-125)

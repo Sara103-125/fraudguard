@@ -37,3 +37,4 @@ Thumbs.db
 .streamlit/secrets.toml
 .tmp/
 .pip-cache/
+pytest-cache-files-*/
